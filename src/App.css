@@ -6,7 +6,6 @@
   -webkit-user-select: none;
 }
 
-
 :root {
   --purple: #9b59d0;
   --purple-light: #b07ee0;
@@ -28,7 +27,8 @@ html, body, #root {
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background: var(--bg);
   color: var(--text);
   font-size: 14px;
@@ -40,7 +40,8 @@ body {
   display: flex;
   height: 100vh;
   width: 100vw;
-  background: url('/alya-bg.png') calc(50% + 110px) center / 130% auto no-repeat;
+  background: url("/alya-bg.png") calc(50% + 110px) center / 130% auto
+    no-repeat;
   position: relative;
 }
 
@@ -63,7 +64,7 @@ body {
   align-items: center;
   gap: 10px;
   padding: 0 20px 24px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .logo-img {
@@ -148,7 +149,6 @@ body {
 
 .topbar {
   height: 52px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   display: flex;
   align-items: center;
   padding: 0 24px;
@@ -203,11 +203,16 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
+  top: 0;
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 28px 24px;
-  background: linear-gradient(to top, rgba(6, 4, 12, 0.85) 0%, rgba(6, 4, 12, 0.0) 100%);
+  align-items: flex-end;
+  padding: 80px 24px;
+  background: linear-gradient(
+    to top,
+    rgba(6, 4, 12, 0.85) 0%,
+    rgba(6, 4, 12, 0.0) 50%
+  );
 }
 
 .console-overlay {
@@ -237,7 +242,7 @@ body {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   transition: background 0.15s, border-color 0.15s, transform 0.08s;
-  box-shadow: 0 4px 0 rgba(0,0,0,0.4);
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.4);
 }
 
 .btn-play:hover:not(:disabled) {
@@ -247,13 +252,14 @@ body {
 
 .btn-play:active:not(:disabled) {
   transform: translateY(3px);
-  box-shadow: 0 1px 0 rgba(0,0,0,0.4);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
 }
 
 .btn-play:disabled {
   opacity: 0.5;
   cursor: default;
 }
+
 
 .page-header {
   margin-bottom: 28px;
@@ -486,9 +492,18 @@ body {
   margin-top: 1px;
 }
 
-.badge-new { background: rgba(155, 89, 208, 0.18); color: var(--purple-light); }
-.badge-fix { background: rgba(76, 175, 125, 0.15); color: var(--green); }
-.badge-change { background: rgba(240, 192, 64, 0.12); color: #f0c040; }
+.badge-new {
+  background: rgba(155, 89, 208, 0.18);
+  color: var(--purple-light);
+}
+.badge-fix {
+  background: rgba(76, 175, 125, 0.15);
+  color: var(--green);
+}
+.badge-change {
+  background: rgba(240, 192, 64, 0.12);
+  color: #f0c040;
+}
 
 .changelog-text {
   font-size: 13px;
@@ -635,7 +650,7 @@ body {
 }
 
 .toggle::after {
-  content: '';
+  content: "";
   position: absolute;
   width: 12px;
   height: 12px;
@@ -798,7 +813,7 @@ body {
   padding: 12px;
   user-select: text;
   -webkit-user-select: text;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
   font-size: 12px;
   line-height: 1.6;
 }
@@ -814,20 +829,40 @@ body {
 .console-line {
   color: #7070a0;
 }
-.console-line.info { color: #9b59d0; }
-.console-line.success { color: var(--green); }
-.console-line.warn { color: #f0c040; }
-.console-line.error { color: var(--red); }
+.console-line.info {
+  color: #9b59d0;
+}
+.console-line.success {
+  color: var(--green);
+}
+.console-line.warn {
+  color: #f0c040;
+}
+.console-line.error {
+  color: var(--red);
+}
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .spinner {
   width: 13px;
   height: 13px;
-  border: 2px solid rgba(255,255,255,0.25);
+  border: 2px solid rgba(255, 255, 255, 0.25);
   border-top-color: white;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
+}
+
+a {
+  color: var(--purple-light);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+a:hover {
+  color: var(--purple);
 }

@@ -1,18 +1,35 @@
+use std::sync::{Arc, Mutex};
 use tauri::Emitter;
+use tokio::process::Child;
+
+type SharedChild = Arc<Mutex<Option<Child>>>;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    let child: SharedChild = Arc::new(Mutex::new(None));
+
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![launch])
+        .manage(child)
+        .invoke_handler(tauri::generate_handler![launch, kill_game])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
 
 #[tauri::command]
+async fn kill_game(shared: tauri::State<'_, SharedChild>) -> Result<(), String> {
+    let child = shared.lock().unwrap().take();
+    if let Some(mut c) = child {
+        c.kill().await.map_err(|e| format!("Kill error: {e}"))?;
+    }
+    Ok(())
+}
+
+#[tauri::command]
 async fn launch(
     window: tauri::Window,
+    shared: tauri::State<'_, SharedChild>,
     program: String,
     args: Vec<String>,
     cwd: String,
@@ -61,6 +78,22 @@ async fn launch(
         }
     });
 
-    let status = child.wait().await.map_err(|e| format!("Wait error: {e}"))?;
-    Ok(status.code().unwrap_or(-1))
+    *shared.lock().unwrap() = Some(child);
+
+    loop {
+        tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
+        let mut guard = shared.lock().unwrap();
+        match guard.as_mut() {
+            None => return Ok(-1),
+            Some(child) => {
+                match child.try_wait().map_err(|error| format!("Wait error: {error}"))? {
+                    Some(status) => {
+                        *guard = None;
+                        return Ok(status.code().unwrap_or(-1));
+                    }
+                    None => continue,
+                }
+            }
+        }
+    }
 }

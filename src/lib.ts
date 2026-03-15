@@ -1,8 +1,6 @@
 export const QUOTES = [
   "Five Dabloons",
   "Meow :3",
-  "It goes in",
-  "Crack me"
 ];
 
 export function getRandomQuote(): string {
@@ -41,7 +39,7 @@ export function saveSettings(settings: LauncherSettings): void {
 
 export function getLaunchArgs(settings: LauncherSettings): { program: string; args: string[]; cwd: string } {
   const { javaPath, workDir, maxRam } = settings;
-  const classPath = `Alya-1.0.jar:libs`;
+  const classPath = `Alya.jar:libs`;
   return {
     program: javaPath,
     args: [
@@ -49,7 +47,7 @@ export function getLaunchArgs(settings: LauncherSettings): { program: string; ar
       `-Djava.library.path=natives`,
       `-Dminecraft.launcher.brand=minecraft-launcher`,
       `-Dminecraft.launcher.version=3.2.13`,
-      `-Dminecraft.client.jar=Alya-1.0.jar`,
+      `-Dminecraft.client.jar=Alya.jar`,
       `-cp`, classPath,
       `-Xmx${maxRam}`,
       `-XX:+UnlockExperimentalVMOptions`,
@@ -59,7 +57,7 @@ export function getLaunchArgs(settings: LauncherSettings): { program: string; ar
       `-XX:MaxGCPauseMillis=50`,
       `-XX:G1HeapRegionSize=32M`,
       `-Dlog4j.configurationFile=assets/log_configs/client-1.7.xml`,
-      `Start`,
+      `main.Start`,
       `--gameDir`, `.minecraft`,
       `--assetIndex`, `1.8`,
       `--uuid`, `0`,

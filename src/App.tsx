@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from "preact/hooks";
-import { Home, Settings, Play, Copy, Check } from "lucide-preact";
+import { Home, Settings, Play, Square, Copy, Check } from "lucide-preact";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import { getLaunchArgs, loadSettings, saveSettings, DEFAULT_SETTINGS, getRandomQuote, type LauncherSettings } from "./lib";
 import "./App.css";
 
@@ -12,9 +13,11 @@ interface ConsoleLine {
   type: "info" | "success" | "warn" | "error" | "default";
 }
 
-function HomePage({ onLaunch, launching, keepConsole, lines, onCloseConsole }: {
+function HomePage({ onLaunch, onStop, launching, launched, keepConsole, lines, onCloseConsole }: {
   onLaunch: () => void;
+  onStop: () => void;
   launching: boolean;
+  launched: boolean;
   keepConsole: boolean;
   lines: ConsoleLine[];
   onCloseConsole: () => void;
@@ -35,14 +38,22 @@ function HomePage({ onLaunch, launching, keepConsole, lines, onCloseConsole }: {
   };
 
   const showConsole = keepConsole && lines.length > 0;
+  const isRunning = launching && launched;
 
   return (
     <div class="home-layout">
       <div class="home-dock">
-        <button class="btn-play" onClick={onLaunch} disabled={launching}>
-          {launching ? <span class="spinner" /> : <Play size={16} fill="currentColor" />}
-          {launching ? "Launching…" : "Play"}
-        </button>
+        {isRunning ? (
+          <button class="btn-play btn-stop" onClick={onStop}>
+            <Square size={16} fill="currentColor" />
+            Stop
+          </button>
+        ) : (
+          <button class="btn-play" onClick={onLaunch} disabled={launching}>
+            {launching && !launched ? <span class="spinner" /> : <Play size={16} fill="currentColor" />}
+            {launching && !launched ? "Launching…" : "Play"}
+          </button>
+        )}
       </div>
 
       {showConsole && (
@@ -91,6 +102,7 @@ function SettingsPage({ settings, onChange }: {
             <div class="settings-row-info">
               <div class="settings-row-label">Java Path</div>
               <div class="settings-row-desc">Path to your Java executable</div>
+              <div class="settings-row-desc">It is advised that you use <a href="#" onClick={event => { event.preventDefault(); openUrl("https://bell-sw.com/pages/downloads/#jdk-8-lts"); }}>Java 8 (Liberica JDK)</a></div>
             </div>
             <input
               class="settings-input"
@@ -102,8 +114,9 @@ function SettingsPage({ settings, onChange }: {
           </div>
           <div class="settings-row">
             <div class="settings-row-info">
-              <div class="settings-row-label">Working Directory</div>
-              <div class="settings-row-desc">Absolute path to your Alya client folder</div>
+              <div class="settings-row-label">Client Directory</div>
+              <div class="settings-row-desc">Absolute path to the directory containing Alya Client.</div>
+              <div class="settings-row-desc">Download <code>alya-release.zip</code> from <a href="#" onClick={event => { event.preventDefault(); openUrl("https://github.com/AlyaClient/alya/releases"); }}>here</a></div>
             </div>
             <input
               class="settings-input"
@@ -121,6 +134,7 @@ function SettingsPage({ settings, onChange }: {
             <div class="settings-row-info">
               <div class="settings-row-label">Max RAM</div>
               <div class="settings-row-desc">Maximum JVM heap (e.g. 4G, 2048M)</div>
+              <div class="settings-row-desc">Note: Minecraft can struggle with more than 4GB of memory</div>
             </div>
             <input
               class="settings-input"
@@ -165,6 +179,7 @@ function SettingsPage({ settings, onChange }: {
 export default function App() {
   const [page, setPage] = useState<Page>("home");
   const [launching, setLaunching] = useState(false);
+  const [launched, setLaunched] = useState(false);
   const [settings, setSettings] = useState<LauncherSettings>(loadSettings);
   const [lines, setLines] = useState<ConsoleLine[]>([]);
   const [quote] = useState<string>(getRandomQuote);
@@ -178,9 +193,14 @@ export default function App() {
     setLines(previousLines => [...previousLines, { text, type }]);
   };
 
+  const handleStop = async () => {
+    await invoke("kill_game").catch(() => {});
+  };
+
   const handleLaunch = async () => {
     if (launching) return;
     setLaunching(true);
+    setLaunched(false);
     setLines([]);
     if (page !== "home") setPage("home");
 
@@ -191,8 +211,9 @@ export default function App() {
     pushLine("[alya] Launching Minecraft 1.8.9…", "info");
 
     try {
-      const unlistenStdout = await listen<string>("launch-stdout", event => pushLine(event.payload, "default"));
-      const unlistenStderr = await listen<string>("launch-stderr", event => pushLine(event.payload, "warn"));
+      const onOutput = (text: string, type: ConsoleLine["type"]) => { setLaunched(true); pushLine(text, type); };
+      const unlistenStdout = await listen<string>("launch-stdout", event => onOutput(event.payload, "default"));
+      const unlistenStderr = await listen<string>("launch-stderr", event => onOutput(event.payload, "warn"));
 
       const exitCode = await invoke<number>("launch", { program, args, cwd });
 
@@ -208,6 +229,7 @@ export default function App() {
       pushLine(`[error] ${error}`, "error");
     } finally {
       setLaunching(false);
+      setLaunched(false);
     }
   };
 
@@ -244,7 +266,9 @@ export default function App() {
           {page === "home" && (
             <HomePage
               onLaunch={handleLaunch}
+              onStop={handleStop}
               launching={launching}
+              launched={launched}
               keepConsole={settings.keepConsole}
               lines={lines}
               onCloseConsole={() => setLines([])}
