@@ -102,7 +102,7 @@ function SettingsPage({ settings, onChange }: {
             <div class="settings-row-info">
               <div class="settings-row-label">Java Path</div>
               <div class="settings-row-desc">Path to your Java executable</div>
-              <div class="settings-row-desc">It is advised that you use <a href="#" onClick={event => { event.preventDefault(); openUrl("https://bell-sw.com/pages/downloads/#jdk-8-lts"); }}>Java 8 (Liberica JDK)</a></div>
+              <div class="settings-row-desc">It is advised that you use <a href="#" onClick={event => { event.preventDefault(); openUrl("https://adoptium.net/temurin/releases/?version=8&os=any&arch=any"); }}>Java 8 (Temurin JDK)</a></div>
             </div>
             <input
               class="settings-input"
@@ -194,7 +194,7 @@ export default function App() {
   };
 
   const handleStop = async () => {
-    await invoke("kill_game").catch(() => {});
+    await invoke("kill_game").catch(() => { });
   };
 
   const handleLaunch = async () => {
