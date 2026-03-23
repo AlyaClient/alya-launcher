@@ -56,7 +56,7 @@ export function getLaunchArgs(settings: LauncherSettings): { program: string; ar
       `-XX:G1ReservePercent=20`,
       `-XX:MaxGCPauseMillis=50`,
       `-XX:G1HeapRegionSize=32M`,
-      `-Dlog4j.configurationFile=assets/log_configs/client-1.7.xml`,
+      `-Dlog4j.configurationFile=include/client-1.7.xml`,
       `start.Main`,
       `--gameDir`, `.minecraft`,
       `--assetIndex`, `1.8`,
