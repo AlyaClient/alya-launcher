@@ -44,7 +44,6 @@ export function getLaunchArgs(settings: LauncherSettings): { program: string; ar
     program: javaPath,
     args: [
       `-XX:HeapDumpPath=Alya.heapdump`,
-      `-Djava.library.path=natives`,
       `-Dminecraft.launcher.brand=minecraft-launcher`,
       `-Dminecraft.launcher.version=3.2.13`,
       `-Dminecraft.client.jar=Alya.jar`,
@@ -56,7 +55,6 @@ export function getLaunchArgs(settings: LauncherSettings): { program: string; ar
       `-XX:G1ReservePercent=20`,
       `-XX:MaxGCPauseMillis=50`,
       `-XX:G1HeapRegionSize=32M`,
-      `-Dlog4j.configurationFile=include/client-1.7.xml`,
       `start.Main`,
       `--gameDir`, `.minecraft`,
       `--assetIndex`, `1.8`,
