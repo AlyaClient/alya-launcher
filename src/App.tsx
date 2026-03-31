@@ -370,7 +370,7 @@ export default function App() {
 
     await new Promise(resolve => setTimeout(resolve, 50));
 
-    const { program, args, cwd } = getLaunchArgs(settings);
+    const { program, args, cwd } = getLaunchArgs(settings, navigator.userAgent.includes("Mac"));
 
     pushLine("[alya] Launching Minecraft 1.8.9…", "info");
 

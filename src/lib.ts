@@ -37,13 +37,14 @@ export function saveSettings(settings: LauncherSettings): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
 }
 
-export function getLaunchArgs(settings: LauncherSettings): { program: string; args: string[]; cwd: string } {
+export function getLaunchArgs(settings: LauncherSettings, isMacOS = false): { program: string; args: string[]; cwd: string } {
   const { javaPath, workDir, maxRam } = settings;
   const classPath = `Alya.jar:libs`;
   return {
     program: javaPath,
     args: [
       `-XX:HeapDumpPath=Alya.heapdump`,
+      ...(isMacOS ? [`-XstartOnFirstThread`] : []),
       `-Dminecraft.launcher.brand=minecraft-launcher`,
       `-Dminecraft.launcher.version=3.2.13`,
       `-Dminecraft.client.jar=Alya.jar`,
