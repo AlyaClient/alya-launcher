@@ -19,8 +19,8 @@ export const DEFAULT_SETTINGS: LauncherSettings = {
   javaPath: "java",
   workDir: "",
   maxRam: "4G",
-  closeOnLaunch: true,
-  keepConsole: true,
+  closeOnLaunch: false,
+  keepConsole: false,
 };
 
 const STORAGE_KEY = "alya_settings";

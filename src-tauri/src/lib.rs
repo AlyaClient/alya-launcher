@@ -4,6 +4,39 @@ use tokio::process::Child;
 
 type SharedChild = Arc<Mutex<Option<Child>>>;
 
+#[derive(serde::Serialize, serde::Deserialize, Default, Clone)]
+struct LauncherStats {
+    times_launched: u64,
+    total_playtime_seconds: u64,
+}
+
+#[tauri::command]
+async fn read_stats(app: tauri::AppHandle) -> Result<LauncherStats, String> {
+    use tauri::Manager;
+    let stats_path = app
+        .path()
+        .app_data_dir()
+        .map_err(|error| error.to_string())?
+        .join("stats.json");
+    if !stats_path.exists() {
+        return Ok(LauncherStats::default());
+    }
+    let contents = std::fs::read_to_string(&stats_path).map_err(|error| error.to_string())?;
+    serde_json::from_str(&contents).map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+async fn write_stats(app: tauri::AppHandle, stats: LauncherStats) -> Result<(), String> {
+    use tauri::Manager;
+    let data_dir = app
+        .path()
+        .app_data_dir()
+        .map_err(|error| error.to_string())?;
+    std::fs::create_dir_all(&data_dir).map_err(|error| error.to_string())?;
+    let contents = serde_json::to_string(&stats).map_err(|error| error.to_string())?;
+    std::fs::write(data_dir.join("stats.json"), contents).map_err(|error| error.to_string())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let child: SharedChild = Arc::new(Mutex::new(None));
@@ -12,7 +45,7 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_opener::init())
         .manage(child)
-        .invoke_handler(tauri::generate_handler![launch, kill_game])
+        .invoke_handler(tauri::generate_handler![launch, kill_game, read_stats, write_stats])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
