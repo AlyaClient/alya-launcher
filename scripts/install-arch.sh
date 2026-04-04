@@ -2,6 +2,8 @@
 
 set -e
 
+# deno task tauri build
+
 DEB=$(find src-tauri/target/release/bundle/deb -name "*.deb" | head -1)
 
 if [ -z "$DEB" ]; then

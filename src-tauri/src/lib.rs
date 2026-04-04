@@ -81,6 +81,13 @@ async fn launch(
             .and_then(|p| p.parent().map(|p| p.to_path_buf()))
             .unwrap_or_else(|| std::path::PathBuf::from("."))
     };
+
+    if !abs_cwd.exists() {
+        if let Err(error) = std::fs::create_dir_all(&abs_cwd) {
+            return Err(format!("Failed to create working directory: {}", error));
+        }
+    }
+
     let _ = window.emit("launch-stdout", format!("[alya] resolved cwd: {}", abs_cwd.display()));
 
     let mut child = Command::new(&program)

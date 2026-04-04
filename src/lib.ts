@@ -39,7 +39,9 @@ export function saveSettings(settings: LauncherSettings): void {
 
 export function getLaunchArgs(settings: LauncherSettings, isMacOS = false): { program: string; args: string[]; cwd: string } {
   const { javaPath, workDir, maxRam } = settings;
-  const classPath = `Alya.jar:libs`;
+  const classPath = `../Alya.jar:../libs`;
+  const workDir$1 = `${workDir}/.minecraft`;
+
   return {
     program: javaPath,
     args: [
@@ -57,11 +59,11 @@ export function getLaunchArgs(settings: LauncherSettings, isMacOS = false): { pr
       `-XX:MaxGCPauseMillis=50`,
       `-XX:G1HeapRegionSize=32M`,
       `start.Main`,
-      `--gameDir`, `.minecraft`,
+      `--gameDir`, workDir$1,
       `--assetIndex`, `1.8`,
       `--uuid`, `0`,
       `--userType`, `msa`,
     ],
-    cwd: workDir,
+    cwd: workDir$1,
   };
 }

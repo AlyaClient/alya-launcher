@@ -379,6 +379,7 @@ export default function App() {
       const unlistenStdout = await listen<string>("launch-stdout", event => onOutput(event.payload, "default"));
       const unlistenStderr = await listen<string>("launch-stderr", event => onOutput(event.payload, "warn"));
 
+      setLaunched(true);
       const exitCode = await invoke<number>("launch", { program, args, cwd });
 
       unlistenStdout();
