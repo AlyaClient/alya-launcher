@@ -1,6 +1,6 @@
 [package]
 name = "alya-launcher"
-version = "0.1.0"
+version = "0.1.2"
 description = "Alya Client Launcher"
 authors = ["Alya Client", "Thoq"]
 edition = "2021"
